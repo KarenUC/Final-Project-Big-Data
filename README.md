@@ -8,5 +8,5 @@ Este trabajo contiene:
 
 - `document`: First Submission y Paper de Jeong et al (2022).
 - `scripts`: Scripts de R
-- `stores`: Bases utilizadas (Anuario de Siniestralidad vial 2017 y 2018)
+- `stores`: Bases utilizadas (Anuario de Siniestralidad vial 2017, 2018 y 2019)
 - `views`: Imágenes
