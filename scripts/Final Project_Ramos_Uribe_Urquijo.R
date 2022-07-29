@@ -52,6 +52,8 @@ base_2019_victimas <- read_excel("stores/Base_2019.xlsx", sheet = "VICTIMAS")
 base_2019_conductores <- read_excel("stores/Base_2019.xlsx", sheet = "CONDUCTORES")
 base_2019_siniestros <- read_excel("stores/Base_2019.xlsx", sheet = "ACCIDENTES")
 
+# Unir bases
+
 
  ############### ========= CREACION VARIABLES ============ ##############
 
@@ -196,9 +198,32 @@ table(base_2017_siniestros$ClaseNombre)
 class(base_2017_siniestros$CON_EMBRIAGUEZ)
 table(base_2017_siniestros$CON_EMBRIAGUEZ)
 
+base_2017_siniestros$CON_EMBRIAGUEZ <- factor(base_2017_siniestros$CON_EMBRIAGUEZ, 
+                                              levels = c("SI", "NO"),
+                                              labels = c("SI", "NO"))  ## Poner variable como categorica
 
 
 
+class(base_2017_siniestros$CON_EMBRIAGUEZ)
+table(base_2017_siniestros$CON_EMBRIAGUEZ)
+
+#1. Velocidad
+
+class(base_2017_siniestros$CON_VELOCIDAD)
+table(base_2017_siniestros$CON_VELOCIDAD)
+
+base_2017_siniestros$CON_VELOCIDAD <- factor(base_2017_siniestros$CON_VELOCIDAD, 
+                                              levels = c("SI", "NO"),
+                                              labels = c("SI", "NO"))  ## Poner variable como categorica
+
+
+
+class(base_2017_siniestros$CON_VELOCIDAD)
+table(base_2017_siniestros$CON_VELOCIDAD)
+
+# Gender ****** PENDIENTE
+
+# Age
 
 
 
