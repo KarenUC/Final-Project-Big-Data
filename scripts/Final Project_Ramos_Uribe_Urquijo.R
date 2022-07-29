@@ -24,55 +24,130 @@ p_load(skimr, # summary data
        sf, # Leer/escribir/manipular datos espaciales
        leaflet, #visualizciÃ³n
        tmaptools, #geocode
-       osmdata,
+       osmdata, # Get OSM data
        expss,
        ggmap,
-       readr# Get OSM data
+       readr, 
+       readxl
 )
 
 
-# Geocoding a csv column of "addresses" in R
-
-#load ggmap
-library(ggmap)
 
 setwd("C:/Users/kurib/OneDrive - Universidad de los Andes/Documentos/MECA/Github/Final-Project-Big-Data")
 
-Base_2017_VIC <- read_csv("stores/Base_2017_VIC.csv")
-Base_2017_COND <- read_csv("stores/Base_2017_COND.csv")
-Base_2017_ACC <- read_csv("stores/Base_2017_ACC.csv")
+# 2017 
+base_2017_victimas <- read_excel("stores/Base_2017.xlsx", sheet = "VICTIMAS")
+base_2017_conductores <- read_excel("stores/Base_2017.xlsx", sheet = "CONDUCTORES")
+base_2017_siniestros <- read_excel("stores/Base_2017.xlsx", sheet = "ACCIDENTES")
 
-#Validar que variables nos sirven de cada base
+class(base_2017_victimas)
 
-#Validando la base, no podemos identificar el culpable. Propongo cambiar culpable por conductor y ya. 
+# 2018 
+base_2018_victimas <- read_excel("stores/Base_2018.xlsx", sheet = "VICTIMAS")
+base_2018_conductores <- read_excel("stores/Base_2018.xlsx", sheet = "CONDUCTORES")
+base_2018_siniestros <- read_excel("stores/Base_2018.xlsx", sheet = "ACCIDENTES")
 
-#Incluir Número de vehículos involucrados, edad promedio conductor y edad promedio víctima y para el género contar. 
+# 2019
+base_2019_victimas <- read_excel("stores/Base_2019.xlsx", sheet = "VICTIMAS")
+base_2019_conductores <- read_excel("stores/Base_2019.xlsx", sheet = "CONDUCTORES")
+base_2019_siniestros <- read_excel("stores/Base_2019.xlsx", sheet = "ACCIDENTES")
 
-#La de conductores
-colnames(Base_2017_COND)
 
-summary(Base_2017_COND$Vehiculo)
+ ############### ========= CREACION VARIABLES ============ ##############
 
-Base_2017_COND$num_conductores <- Base_2017_COND %>% 
-  group_by(id) %>% 
+#Validando la base, no podemos identificar el culpable. Propongo cambiar culpable por conductor. 
+#Incluir Número de vehículos involucrados, edad promedio conductor y edad promedio víctima y para el género contar el número de mujeres y hombres involucrados. 
+#Para fecha: as.Date(Base$variable, format = '%m/%d/%Y')
+
+
+#======= BASE 2017 ======#
+### Crear numero de vehículos involucrados por accidente
+
+num_vehic <- base_2017_conductores %>% 
+  group_by(id)%>% 
   summarise(Vehiculo = n())
 
-Base_2017_COND$vEHI2 = Base_2017_COND %>% 
+base_2017_siniestros <-base_2017_siniestros %>% left_join(num_vehic,by="id")
+
+sum(is.na(base_2017_siniestros$Vehiculo))
+
+### Crear numero de victimas por accidente
+colnames(base_2017_victimas)
+
+num_vic <- base_2017_victimas %>% 
   group_by(id)%>% 
-  count(Vehiculo)
+  summarise(Numero = n())
 
-Base_2017_COND$num_conductores <- Base_2017_COND %>% 
+base_2017_siniestros <-base_2017_siniestros %>% left_join(num_vic,by="id")
+base_2017_siniestros$SD <- (base_2017_siniestros$GravedadNombre)
+
+sum(is.na(base_2017_siniestros$Numero))
+
+#Asumir que no existen víctimas si existe NA
+
+base_2017_siniestros$Numero <- ifelse(is.na(base_2017_siniestros$Numero),
+                                       yes = 0,
+                                       no = base_2017_siniestros$Numero)
+
+table(base_2017_siniestros$Numero, base_2017_siniestros$SD)
+
+### Crear edad promedio conductores
+
+class(base_2017_conductores$EDAD_PROCESADA)
+
+m_edad_c <- base_2017_conductores %>% 
+  group_by(id)%>% 
+  summarise(m_edad_c = round(mean(EDAD_PROCESADA), digits = 0))
+
+base_2017_siniestros <-base_2017_siniestros %>% left_join(m_edad_c,by="id")
+
+### Crear edad promedio victimas
+
+class(base_2017_victimas$EDAD_PROCESADA)
+
+m_edad_v <- base_2017_victimas %>% 
+  group_by(id)%>% 
+  summarise(m_edad_v = round(mean(EDAD_PROCESADA), digits = 0))
+
+base_2017_siniestros <-base_2017_siniestros %>% left_join(m_edad_v,by="id")
+table(base_2017_siniestros$Numero, base_2017_siniestros$SD)
+
+### Variable género 
+# Hay dos opciones: contar el numero de mujeres y hombres o dummy mayoría mujeres =1 y 0 de lo contrario
+
+#Numero de mujeres y hombres
+
+# Conductores
+
+num_hombres_c <- base_2017_conductores %>% 
   group_by(id) %>% 
-  summarise(vEHI2 = n())
+  summarise(num_hombres_c = sum(Sexo == "MASCULINO"))
 
-summarise(Base_2017_COND$num_conductores)
+num_mujeres_c <- base_2017_conductores %>% 
+  group_by(id) %>% 
+  summarise(num_mujeres_c = sum(Sexo == "FEMENINO"))
 
-class(Base_2017_ACC$Latitud)
-table(Base_2017_ACC$Latitud)
+num_otro_c <- base_2017_conductores %>% 
+  group_by(id) %>% 
+  summarise(num_otro_c = sum(Sexo == "NO APLICA"))
 
 
-df_2017 <- right_join(Base_2017_ACC, Base_2017_COND, by = "id")
-base_2017_total <- full_join(df_2017, Base_2017_VIC, by = "id")
+base_2017_siniestros <-base_2017_siniestros %>% left_join(num_hombres_c,by="id")
+base_2017_siniestros <-base_2017_siniestros %>% left_join(num_mujeres_c,by="id")
+
+table(base_2017_siniestros$SD, base_2017_siniestros$num_hombres_c)
+table(base_2017_siniestros$SD, base_2017_siniestros$num_mujeres_c)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
