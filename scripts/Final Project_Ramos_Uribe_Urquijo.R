@@ -158,23 +158,43 @@ base_2017_siniestros <-base_2017_siniestros %>% left_join(num_mujeres_v,by="id")
                       #  Localidad, HoraOcurrencia, TipoTiempo, Vehiculo, Numero, m_edad_c, m_edad_v, num_hombres_c, num_mujeres_c, 
                       #   num_hombres_v, num_mujeres_v
 
+#### DEPENDENT VARIABLE
+
 # Variable Dependiente: Grado de severidad del choque (1 con muertos, 2 con heridos, 3 con daños) - Dejarla en 1 severo 0 no severo
 
 
-class(base_2017_siniestros$GravedadNombre) #Preferiria dejar el mayor numero como el mas severo y solo dos categorias
+class(base_2017_siniestros$GravedadNombre) #Preferiria dejar solo dos categorias
 
-base_2017_siniestros$GravedadNombre[base_2017_siniestros$GravedadNombre== "Con Heridos"] <- "Con Muertos" # Dejar solo dos categorias
+base_2017_siniestros$GravedadNombre[base_2017_siniestros$GravedadNombre== "Con Heridos"] <- "Con Muertos" 
 
 base_2017_siniestros$GravedadNombre <- factor(base_2017_siniestros$GravedadNombre, 
                                                  levels = c("Con Muertos", "Solo Daños"),
-                                                 labels = c("Severo", "Leve"))
-
-
-
+                                                 labels = c("Severo", "Leve"))  ## Poner variable como categorica
 class(base_2017_siniestros$GravedadNombre)
 levels(base_2017_siniestros$GravedadNombre)
 table(base_2017_siniestros$GravedadNombre)
 
+### HUMAN FACTOR
+
+# Accident Type: ClaseNombre
+
+class(base_2017_siniestros$ClaseNombre)
+table(base_2017_siniestros$ClaseNombre)
+
+base_2017_siniestros$ClaseNombre <- factor(base_2017_siniestros$ClaseNombre, 
+                                           levels = c("Atropello", "Autolesion", "Caida Ocupante", "Choque",
+                                                      "Incendio", "Otro", "Volcamiento"),
+                                           labels = c("Atropello", "Autolesion", "Caida Ocupante", "Choque",
+                                                      "Incendio", "Otro", "Volcamiento"))  ## Poner variable como categorica
+class(base_2017_siniestros$ClaseNombre)
+table(base_2017_siniestros$ClaseNombre)
+
+# Violation of law: 
+
+#1. Embriaguez
+
+class(base_2017_siniestros$CON_EMBRIAGUEZ)
+table(base_2017_siniestros$CON_EMBRIAGUEZ)
 
 
 
