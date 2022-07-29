@@ -112,7 +112,7 @@ m_edad_v <- base_2017_victimas %>%
 base_2017_siniestros <-base_2017_siniestros %>% left_join(m_edad_v,by="id")
 table(base_2017_siniestros$Numero, base_2017_siniestros$SD)
 
-### Variable género 
+### Variable género ********** OJO REVISAR
 # Hay dos opciones: contar el numero de mujeres y hombres o dummy mayoría mujeres =1 y 0 de lo contrario
 
 # == Numero de mujeres y hombres
@@ -152,7 +152,28 @@ base_2017_siniestros <-base_2017_siniestros %>% left_join(num_hombres_v,by="id")
 base_2017_siniestros <-base_2017_siniestros %>% left_join(num_mujeres_v,by="id")
 
 
+############### ========= ORGANIZACION VARIABLES RELEVANTES ============ ##############
 
+## Variables relevantes: id, Dia, Fecha, GravedadCod, GravedadNombre, ClaseCodigo, ClaseNombre, Latitud, Longitud, Direccion,
+                      #  Localidad, HoraOcurrencia, TipoTiempo, Vehiculo, Numero, m_edad_c, m_edad_v, num_hombres_c, num_mujeres_c, 
+                      #   num_hombres_v, num_mujeres_v
+
+# Variable Dependiente: Grado de severidad del choque (1 con muertos, 2 con heridos, 3 con daños) - Dejarla en 1 severo 0 no severo
+
+
+class(base_2017_siniestros$GravedadNombre) #Preferiria dejar el mayor numero como el mas severo y solo dos categorias
+
+base_2017_siniestros$GravedadNombre[base_2017_siniestros$GravedadNombre== "Con Heridos"] <- "Con Muertos" # Dejar solo dos categorias
+
+base_2017_siniestros$GravedadNombre <- factor(base_2017_siniestros$GravedadNombre, 
+                                                 levels = c("Con Muertos", "Solo Daños"),
+                                                 labels = c("Severo", "Leve"))
+
+
+
+class(base_2017_siniestros$GravedadNombre)
+levels(base_2017_siniestros$GravedadNombre)
+table(base_2017_siniestros$GravedadNombre)
 
 
 
