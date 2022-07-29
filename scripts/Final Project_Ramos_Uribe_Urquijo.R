@@ -115,7 +115,7 @@ table(base_2017_siniestros$Numero, base_2017_siniestros$SD)
 ### Variable género 
 # Hay dos opciones: contar el numero de mujeres y hombres o dummy mayoría mujeres =1 y 0 de lo contrario
 
-#Numero de mujeres y hombres
+# == Numero de mujeres y hombres
 
 # Conductores
 
@@ -137,6 +137,19 @@ base_2017_siniestros <-base_2017_siniestros %>% left_join(num_mujeres_c,by="id")
 
 table(base_2017_siniestros$SD, base_2017_siniestros$num_hombres_c)
 table(base_2017_siniestros$SD, base_2017_siniestros$num_mujeres_c)
+
+# Victimas
+
+num_hombres_v <- base_2017_victimas %>% 
+  group_by(id) %>% 
+  summarise(num_hombres_v = sum(Sexo == "MASCULINO"))
+
+num_mujeres_v <- base_2017_victimas %>% 
+  group_by(id) %>% 
+  summarise(num_mujeres_v = sum(Sexo == "FEMENINO"))
+
+base_2017_siniestros <-base_2017_siniestros %>% left_join(num_hombres_v,by="id")
+base_2017_siniestros <-base_2017_siniestros %>% left_join(num_mujeres_v,by="id")
 
 
 
