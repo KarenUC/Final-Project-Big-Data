@@ -31,8 +31,8 @@ p_load(skimr, # summary data
        readxl
 )
 
-#setwd("/Users/jdaviduu96/Documents/MECA 2022/Big Data y Machine Learning 2022-13/Final Project/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
-setwd("C:/Users/pau_9/Documents/GitHub/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
+setwd("/Users/jdaviduu96/Documents/MECA 2022/Big Data y Machine Learning 2022-13/Final Project/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
+#setwd("C:/Users/pau_9/Documents/GitHub/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
 #setwd("C:/Users/kurib/OneDrive - Universidad de los Andes/Documentos/MECA/Github/Final-Project-Big-Data")
 
 # 2017 
@@ -599,7 +599,7 @@ base_siniestros$num_carga_v <- ifelse(is.na(base_siniestros$num_carga_v),0,base_
 base_siniestros$num_moto_v <- ifelse(is.na(base_siniestros$num_moto_v),0,base_siniestros$num_moto_v)
 base_siniestros$num_bici_v <- ifelse(is.na(base_siniestros$num_bici_v),0,base_siniestros$num_bici_v)
 base_siniestros$num_otro_vehi_v <- ifelse(is.na(base_siniestros$num_otro_vehi_v),0,base_siniestros$num_otro_vehi_v)
-base_siniestros$num_peatones_v <- ifelse(is.na(base_siniestros$num_peatones_v),0,base_siniestrosv$num_peatones_v)
+base_siniestros$num_peatones_v <- ifelse(is.na(base_siniestros$num_peatones_v),0,base_siniestros$num_peatones_v)
 
 
 #########--------Enviromental factors ---------#######################################
