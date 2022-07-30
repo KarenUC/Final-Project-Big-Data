@@ -31,8 +31,8 @@ p_load(skimr, # summary data
        readxl
 )
 
-setwd("/Users/jdaviduu96/Documents/MECA 2022/Big Data y Machine Learning 2022-13/Final Project/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
-#setwd("C:/Users/pau_9/Documents/GitHub/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
+#setwd("/Users/jdaviduu96/Documents/MECA 2022/Big Data y Machine Learning 2022-13/Final Project/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
+setwd("C:/Users/pau_9/Documents/GitHub/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
 #setwd("C:/Users/kurib/OneDrive - Universidad de los Andes/Documentos/MECA/Github/Final-Project-Big-Data")
 
 # 2017 
@@ -507,22 +507,20 @@ num_peatones_v <- base_victimas %>%
 
 ### Pegar a base de siniestros
 
-base_siniestros$num_autos_c <-left_join(base_siniestros,num_autos_c, by="idFormulario")
-base_siniestros$num_serv_pub_c <-left_join(base_siniestros,num_serv_pub_c, by="idFormulario")
-base_siniestros$num_carga_c <-left_join(base_siniestros,num_carga_c, by="idFormulario")
-base_siniestros$num_moto_c <-left_join(base_siniestros,num_moto_c, by="idFormulario")
-base_siniestros$num_bici_c <-left_join(base_siniestros,num_bici_c, by="idFormulario")
-base_siniestros$num_otro_vehi_c <-left_join(base_siniestros,num_otro_vehi_c, by="idFormulario")
+base_siniestros<-left_join(base_siniestros,num_autos_c, by="idFormulario")
+base_siniestros <-left_join(base_siniestros,num_serv_pub_c, by="idFormulario")
+base_siniestros <-left_join(base_siniestros,num_carga_c, by="idFormulario")
+base_siniestros<-left_join(base_siniestros,num_moto_c, by="idFormulario")
+base_siniestros<-left_join(base_siniestros,num_bici_c, by="idFormulario")
+base_siniestros<-left_join(base_siniestros,num_otro_vehi_c, by="idFormulario")
 
-base_siniestros$num_autos_v <-left_join(base_siniestros,num_autos_v, by="idFormulario")
-base_siniestros$num_serv_pub_v <-left_join(base_siniestros,num_serv_pub_v, by="idFormulario")
-base_siniestros$num_carga_v <-left_join(base_siniestros,num_carga_v, by="idFormulario")
-base_siniestros$num_moto_v <-left_join(base_siniestros,num_moto_v, by="idFormulario")
-base_siniestros$num_bici_v <-left_join(base_siniestros,num_bici_v, by="idFormulario")
-base_siniestros$num_otro_vehi_v <-left_join(base_siniestros,num_otro_vehi_v, by="idFormulario")
-base_siniestros$num_peatones_v <-left_join(base_siniestros,num_peatones_v, by="idFormulario")
-
-
+base_siniestros<-left_join(base_siniestros,num_autos_v, by="idFormulario")
+base_siniestros <-left_join(base_siniestros,num_serv_pub_v, by="idFormulario")
+base_siniestros <-left_join(base_siniestros,num_carga_v, by="idFormulario")
+base_siniestros<-left_join(base_siniestros,num_moto_v, by="idFormulario")
+base_siniestros <-left_join(base_siniestros,num_bici_v, by="idFormulario")
+base_siniestros <-left_join(base_siniestros,num_otro_vehi_v, by="idFormulario")
+base_siniestros<-left_join(base_siniestros,num_peatones_v, by="idFormulario")
 
 #########--------Enviromental factors ---------#######################################
 
