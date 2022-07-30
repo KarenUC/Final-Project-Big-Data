@@ -298,9 +298,9 @@ class(base_siniestros$ClaseNombre)
 table(base_siniestros$ClaseNombre)
 
 base_siniestros$TipoAccidente <- factor(base_siniestros$ClaseNombre, 
-                                           levels = c("Atropello", "Autolesion", "Caida Ocupante", "Choque",
+                                           levels = c("Atropello", "Autolesion", "Caida de ocupante", "Choque",
                                                       "Incendio", "Otro", "Volcamiento"),
-                                           labels = c("Atropello", "Autolesion", "Caida Ocupante", "Choque",
+                                           labels = c("Atropello", "Autolesion", "Caida de ocupante", "Choque",
                                                       "Incendio", "Otro", "Volcamiento"))  ## Poner variable como categorica
 class(base_siniestros$TipoAccidente)
 table(base_siniestros$TipoAccidente)
@@ -350,7 +350,7 @@ OI <-left_join(OtraInfrac,OtraInfraV, by="idFormulario")
 OI$Otrainfra_c_v<-ifelse((OI$OtraInfrac>=1 | OI$OtraInfrav>=1 ),1, 0)
 OI <- OI%>% select (1,4) 
 base_siniestros <-left_join(base_siniestros,OI, by="idFormulario")
-
+base_siniestros$Otrainfra_c_v <- ifelse(is.na(base_siniestros$Otrainfra_c_v), 0, base_siniestros$Otrainfra_c_v)
 
 # Gender ****** 
 
@@ -622,6 +622,12 @@ base_siniestros$tiempo = ifelse(base_siniestros$HORA_PROCESADA<=18 & base_sinies
 base_siniestros$tiempo = ifelse(base_siniestros$HORA_PROCESADA<=24 & base_siniestros$HORA_PROCESADA>18,
                          yes = "Noche",
                          no = base_siniestros$tiempo)
+
+
+############ Revisar NAS base_siniestros ######################
+summary(base_siniestros)
+
+
 
 
 
