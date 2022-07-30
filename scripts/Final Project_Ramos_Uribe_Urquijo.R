@@ -756,16 +756,31 @@ rfThresh
 
 #### el corte es  0.5250239
 
-train_base_siniestros <- train_base_siniestros %>% group_by(idFormulario) %>% mutate(hat_gravedad_05=ifelse(train_base_siniestros$lasso_upsample>0.5,"Severo","Leve"),
-                                      hat_gravedad_rfThresh=ifelse(train_base_siniestros$lasso_upsample>rfThresh$threshold,"Severo","Leve"))
+train_base_siniestros$hat_gravedad_05=ifelse(train_base_siniestros$lasso_upsample>0.5,"Severo","Leve")
+
+train_base_siniestros$hat_gravedad_rfThresh=ifelse(train_base_siniestros$lasso_upsample>rfThresh$threshold,"Severo","Leve")
 
 ##### Matriz de confusión ################
 
-with(testResults,table(Pobre,lasso_upsample))
-cm_logit = confusionMatrix(data=factor(train_base_siniestros$lasso_upsample) , 
-                           reference=factor(train_base_siniestros$GravedadNombre) , 
-                           mode="sens_spec" , positive="1")
+with(train_base_siniestros,table(GravedadNombre,hat_gravedad_05))
+with(train_base_siniestros,table(GravedadNombre,hat_gravedad_rfThresh))
 
+#Preferimos identificar los siniestros severos que es reducir el erro tipo 2. Por lo que preferimos usar el cutoff en 0.5
+
+#########--Predicción con test--- ##########################################################################################################################
+
+test_base_siniestros$lasso_upsample<- predict(logit_lasso_upsample,
+                                               newdata = test_base_siniestros,
+                                               type = "prob")[,1]
+
+summary(test_base_siniestros$GravedadNombre)
+summary(test_base_siniestros$lasso_upsample)
+
+test_base_siniestros$hat_gravedad_05=ifelse(test_base_siniestros$lasso_upsample>0.5,"Severo","Leve")
+
+##### Matriz de confusión ################
+
+with(test_base_siniestros,table(GravedadNombre,hat_gravedad_05))
 
 
 ######--- XGBOOST ---######
