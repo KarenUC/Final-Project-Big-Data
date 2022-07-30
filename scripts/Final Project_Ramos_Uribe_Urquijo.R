@@ -876,12 +876,12 @@ abline(h = 8, lty = 2)
 cl<-dbscan(df_train,eps=8,MinPts = 60)
 head(cbind(df_train,cl$cluster))
 
-##DBSCAN clustering for 57569 objects.
-# Parameters: eps = 4, minPts = 60
-# The clustering contains 1 cluster(s) and 108 noise points.
+# DBSCAN clustering for 57569 objects.
+# Parameters: eps = 8, minPts = 60
+# The clustering contains 6 cluster(s) and 228 noise points.
 # 
-# 0     1 
-# 108 57461 
+# 0     1     2     3     4     5     6 
+# 228 55085   388   638   471   687    72 
 # 
 # Available fields: cluster, eps, minPts
 p_load(factoextra)
