@@ -31,9 +31,9 @@ p_load(skimr, # summary data
        readxl
 )
 
-
+setwd("/Users/jdaviduu96/Documents/MECA 2022/Big Data y Machine Learning 2022-13/Final Project/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
 #setwd("C:/Users/pau_9/Documents/GitHub/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
-setwd("C:/Users/kurib/OneDrive - Universidad de los Andes/Documentos/MECA/Github/Final-Project-Big-Data")
+#setwd("C:/Users/kurib/OneDrive - Universidad de los Andes/Documentos/MECA/Github/Final-Project-Big-Data")
 
 # 2017 
 base_2017_victimas <- read_excel("stores/Base_2017.xlsx", sheet = "VICTIMAS")
@@ -280,10 +280,10 @@ table(base_siniestros$GravedadNombre)
 
 base_siniestros$GravedadNombre[base_siniestros$GravedadNombre== "Con Heridos"] <- "Con Muertos" 
 
-#Ojo cambiar variable daÒos para que quede bien
+#Ojo cambiar variable da?os para que quede bien
 
 base_siniestros$GravedadNombre <- factor(base_siniestros$GravedadNombre, 
-                                                 levels = c("Con Muertos", "Solo DaÒos"),
+                                                 levels = c("Con Muertos", "Solo Da√±os"),
                                                  labels = c("Severo", "Leve"))  ## Poner variable como categorica
 class(base_siniestros$GravedadNombre)
 levels(base_siniestros$GravedadNombre)
@@ -420,52 +420,116 @@ class(base_siniestros$TipoDisenno)
 table(base_siniestros$TipoDisenno)
 
 
-# Vehicles type ********PEDIENTE
+# Vehicles type Conductores
 
 table(base_conductores$ClaseVehiculo)
 
+### Agrupar tipo de vehiculo por: Autos, Carga, Servicio p√∫blico, moto y bici
+
 num_autos_c <- base_conductores %>% 
               group_by(idFormulario) %>%
-              summarise(num_autos_c = sum(ClaseVehiculo == "Automovil"))
+              summarise(num_autos_c = sum(ClaseVehiculo == "Automovil"|
+                                            ClaseVehiculo== "Camioneta"|
+                                             ClaseVehiculo=="Campero"))
+
+num_serv_pub_c <- base_conductores %>% 
+  group_by(idFormulario) %>%
+  summarise(num_serv_pub_c = sum(ClaseVehiculo == "Bus"|
+                                ClaseVehiculo== "Buseta"|
+                                  ClaseVehiculo=="Microbus"))
+
+num_carga_c <- base_conductores %>% 
+                  group_by(idFormulario) %>%
+                  summarise(num_carga_c = sum(ClaseVehiculo == "Camion, Furgon"|
+                                                ClaseVehiculo== "Volqueta"|
+                                                 ClaseVehiculo=="Tractocamion"))
+
+num_moto_c <- base_conductores %>% 
+  group_by(idFormulario) %>%
+  summarise(num_moto_c = sum(ClaseVehiculo == "Motocarro"|
+                                  ClaseVehiculo== "Motocicleta"|
+                                   ClaseVehiculo=="Motociclo"|
+                                    ClaseVehiculo=="Cuatrimoto"))
 
 num_bici_c <- base_conductores %>% 
   group_by(idFormulario) %>%
   summarise(num_bici_c = sum(ClaseVehiculo == "Bicicleta"))
 
-num_bicitaxi_c <- base_conductores %>% 
+num_otro_vehi_c <- base_conductores %>% 
   group_by(idFormulario) %>%
-  summarise(num_bicitaxi_c = sum(ClaseVehiculo == "Bicitaxi"))
+  summarise(num_otro_vehi_c = sum(ClaseVehiculo == "Bicitaxi"|
+                                   ClaseVehiculo == "null" ))
 
-num_bus_c <- base_conductores %>% 
+
+
+# Vehicles type Victimas
+
+table(base_victimas$VEHICULO_VIAJABA)
+
+### Agrupar tipo de vehiculo por: Autos, Carga, Servicio p√∫blico, moto y bici
+
+num_autos_v <- base_victimas %>% 
   group_by(idFormulario) %>%
-  summarise(num_bus_c = sum(ClaseVehiculo == "Bus"))
+  summarise(num_autos_v = sum(VEHICULO_VIAJABA == "AUTOMOVIL"|
+                                VEHICULO_VIAJABA== "CAMIONETA"|
+                                VEHICULO_VIAJABA=="CAMPERO"))
 
-num_bus_c <- base_conductores %>% 
+num_serv_pub_v <- base_victimas %>% 
   group_by(idFormulario) %>%
-  summarise(num_bus_c = sum(ClaseVehiculo == "Bus"))
+  summarise(num_serv_pub_v = sum(VEHICULO_VIAJABA == "BUS"|
+                                   VEHICULO_VIAJABA== "BUSETA"|
+                                   VEHICULO_VIAJABA=="MICROBUS"))
+
+num_carga_v <- base_victimas %>% 
+  group_by(idFormulario) %>%
+  summarise(num_carga_v = sum(VEHICULO_VIAJABA == "CAMION, FURGON"|
+                                VEHICULO_VIAJABA== "VOLQUETA"|
+                                VEHICULO_VIAJABA=="TRACTOCAMION"))
+
+num_moto_v <- base_victimas %>% 
+  group_by(idFormulario) %>%
+  summarise(num_moto_v = sum(VEHICULO_VIAJABA == "MOTOCARRO"|
+                               VEHICULO_VIAJABA== "MOTOCICLETA"|
+                               VEHICULO_VIAJABA=="CUATRIMOTO"))
+
+num_bici_v <- base_victimas %>% 
+  group_by(idFormulario) %>%
+  summarise(num_bici_v = sum(VEHICULO_VIAJABA == "BICICLETA"))
+
+num_otro_vehi_v <- base_victimas %>% 
+  group_by(idFormulario) %>%
+  summarise(num_otro_vehi_v = sum(VEHICULO_VIAJABA == "BICITAXI"|
+                                    VEHICULO_VIAJABA == "NULL" ))
+
+num_peatones_v <- base_victimas %>% 
+  group_by(idFormulario) %>%
+  summarise(num_peatones_v = sum(VEHICULO_VIAJABA == "PEATON" ))
+
+### Pegar a base de siniestros
+
+base_siniestros$num_autos_c <-left_join(base_siniestros,num_autos_c, by="idFormulario")
+base_siniestros$num_serv_pub_c <-left_join(base_siniestros,num_serv_pub_c, by="idFormulario")
+base_siniestros$num_carga_c <-left_join(base_siniestros,num_carga_c, by="idFormulario")
+base_siniestros$num_moto_c <-left_join(base_siniestros,num_moto_c, by="idFormulario")
+base_siniestros$num_bici_c <-left_join(base_siniestros,num_bici_c, by="idFormulario")
+base_siniestros$num_otro_vehi_c <-left_join(base_siniestros,num_otro_vehi_c, by="idFormulario")
+
+base_siniestros$num_autos_v <-left_join(base_siniestros,num_autos_v, by="idFormulario")
+base_siniestros$num_serv_pub_v <-left_join(base_siniestros,num_serv_pub_v, by="idFormulario")
+base_siniestros$num_carga_v <-left_join(base_siniestros,num_carga_v, by="idFormulario")
+base_siniestros$num_moto_v <-left_join(base_siniestros,num_moto_v, by="idFormulario")
+base_siniestros$num_bici_v <-left_join(base_siniestros,num_bici_v, by="idFormulario")
+base_siniestros$num_otro_vehi_v <-left_join(base_siniestros,num_otro_vehi_v, by="idFormulario")
+base_siniestros$num_peatones_v <-left_join(base_siniestros,num_peatones_v, by="idFormulario")
+
+
+
+#########--------Enviromental factors ---------#######################################
 
 
 
 
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+######################################################################################
 
 origAddress <- read.csv("stores/Base_2017_VIC", stringsAsFactors = FALSE)
 
