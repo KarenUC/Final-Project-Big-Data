@@ -31,8 +31,8 @@ p_load(skimr, # summary data
        readxl
 )
 
-#setwd("/Users/jdaviduu96/Documents/MECA 2022/Big Data y Machine Learning 2022-13/Final Project/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
-setwd("C:/Users/pau_9/Documents/GitHub/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
+setwd("/Users/jdaviduu96/Documents/MECA 2022/Big Data y Machine Learning 2022-13/Final Project/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
+#setwd("C:/Users/pau_9/Documents/GitHub/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
 #setwd("C:/Users/kurib/OneDrive - Universidad de los Andes/Documentos/MECA/Github/Final-Project-Big-Data")
 
 # 2017 
@@ -60,7 +60,7 @@ base_2018_conductores$Year <- "2018"
 base_2018_siniestros$Year <- "2018"
 
 
-glimpse(base_2017_siniestros)
+glimpse(base_2018_siniestros)
 glimpse(base_2018_conductores)
 glimpse(base_2017_victimas)
 
@@ -73,7 +73,7 @@ base_2017_siniestros <- base_2017_siniestros %>%
                         select(idFormulario, Dia, Fecha, GravedadNombre, ClaseNombre, Latitud, 
                                Longitud, Direccion, TipoDisenno, TipoTiempo, CON_BICICLETA,
                                CON_CARGA, CON_EMBRIAGUEZ, CON_HUECOS, CON_MENORES, CON_MOTO,
-                               CON_PEATON, CON_PERSONA_MAYOR, CON_RUTAS, CON_TPI, CON_VELOCIDAD, Year)
+                               CON_PEATON, CON_PERSONA_MAYOR, CON_RUTAS, CON_TPI, CON_VELOCIDAD, Year, HORA_PROCESADA )
 
 base_2017_conductores <- base_2017_conductores %>%
                         select (idFormulario, Vehiculo, EDAD_PROCESADA, LLevaCinturon, LLevaChaleco, LLevaCasco,
@@ -90,7 +90,7 @@ base_2018_siniestros <- base_2018_siniestros %>%
   select(idFormulario, Dia, Fecha, GravedadNombre, ClaseNombre, Latitud, 
          Longitud, Direccion, TipoDisenno, TipoTiempo, CON_BICICLETA,
          CON_CARGA, CON_EMBRIAGUEZ, CON_HUECOS, CON_MENORES, CON_MOTO,
-         CON_PEATON, CON_PERSONA_MAYOR, CON_RUTAS, CON_TPI, CON_VELOCIDAD, Year)
+         CON_PEATON, CON_PERSONA_MAYOR, CON_RUTAS, CON_TPI, CON_VELOCIDAD, Year, HORA_PROCESADA)
 
 base_2018_conductores <- base_2018_conductores %>%
   select (idFormulario, Vehiculo, EDAD_PROCESADA, LLevaCinturon, LLevaChaleco, LLevaCasco,
@@ -385,6 +385,69 @@ class(base_siniestros$m_edad_v)
 sum(is.na(base_siniestros$m_edad_c))
 sum(is.na(base_siniestros$m_edad_v)) # Esta bien no existen NAs
 
+## ===== crear grupos de edad === #
+
+# Conductores
+
+base_siniestros$categorias_edad_c <- ifelse(base_siniestros$m_edad_c<=18,
+                                            yes = "menor edad",
+                                            no = NA)
+
+base_siniestros$categorias_edad_c <- ifelse(base_siniestros$m_edad_c>18 & base_siniestros$m_edad_c<=34,
+                                            yes = "joven",
+                                            no = base_siniestros$categorias_edad_c)
+
+base_siniestros$categorias_edad_c <- ifelse(base_siniestros$m_edad_c>34 & base_siniestros$m_edad_c<=49,
+                                            yes = "adulto",
+                                            no = base_siniestros$categorias_edad_c)
+
+base_siniestros$categorias_edad_c <- ifelse(base_siniestros$m_edad_c>49 & base_siniestros$m_edad_c<=64,
+                                            yes = "mayor",
+                                            no = base_siniestros$categorias_edad_c)
+
+base_siniestros$categorias_edad_c <- ifelse(base_siniestros$m_edad_c>64,
+                                            yes = "anciano",
+                                            no = base_siniestros$categorias_edad_c)
+
+table(base_siniestros$categorias_edad_c)
+
+table(base_siniestros$categorias_edad_c, base_siniestros$GravedadNombre)
+
+sum(is.na(base_siniestros$categorias_edad_c))
+
+base_siniestros$categorias_edad_c <- as.factor(base_siniestros$categorias_edad_c)
+class(base_siniestros$categorias_edad_c)
+
+# Victimas
+
+base_siniestros$categorias_edad_v <- ifelse(base_siniestros$m_edad_v<=18,
+                                            yes = "menor edad",
+                                            no = NA)
+
+base_siniestros$categorias_edad_v <- ifelse(base_siniestros$m_edad_v>18 & base_siniestros$m_edad_v<=34,
+                                            yes = "joven",
+                                            no = base_siniestros$categorias_edad_v)
+
+base_siniestros$categorias_edad_v <- ifelse(base_siniestros$m_edad_v>34 & base_siniestros$m_edad_v<=49,
+                                            yes = "adulto",
+                                            no = base_siniestros$categorias_edad_v)
+
+base_siniestros$categorias_edad_v <- ifelse(base_siniestros$m_edad_v>49 & base_siniestros$m_edad_v<=64,
+                                            yes = "mayor",
+                                            no = base_siniestros$categorias_edad_v)
+
+base_siniestros$categorias_edad_v <- ifelse(base_siniestros$m_edad_v>64,
+                                            yes = "anciano",
+                                            no = base_siniestros$categorias_edad_v)
+
+table(base_siniestros$categorias_edad_v)
+
+table(base_siniestros$categorias_edad_v, base_siniestros$GravedadNombre)
+
+sum(is.na(base_siniestros$categorias_edad_v))
+
+base_siniestros$categorias_edad_v <- as.factor(base_siniestros$categorias_edad_v)
+class(base_siniestros$categorias_edad_v)
 
 ### ROAD FACTOR
 
@@ -524,6 +587,41 @@ base_siniestros<-left_join(base_siniestros,num_peatones_v, by="idFormulario")
 
 #########--------Enviromental factors ---------#######################################
 
+table(base_siniestros$TipoTiempo)
+
+base_siniestros = base_siniestros %>% 
+  mutate(clima = ifelse(TipoTiempo=="Normal"|TipoTiempo=="Normal/Normal"|
+                          TipoTiempo=="Normal/Viento"|TipoTiempo=="Viento"|TipoTiempo=="Viento/Normal",
+                           yes = "Soleado",
+                           no = TipoTiempo))
+
+base_siniestros = base_siniestros %>% 
+  mutate(clima = ifelse(TipoTiempo=="Granizo"|TipoTiempo=="Lluvia"|TipoTiempo=="Lluvia/Lluvia"|
+                          TipoTiempo=="Lluvia/Normal"|TipoTiempo=="Viento/Lluvia",
+                        yes = "Lluvioso",
+                        no = clima))
+
+base_siniestros = base_siniestros %>% 
+  mutate(clima = ifelse(TipoTiempo=="Niebla"|TipoTiempo=="Niebla/Normal",
+                        yes = "Niebla",
+                        no = clima))
+
+######## ----- Tiempo del siniestro ----- #############
+
+table(base_siniestros$HORA_PROCESADA)
+class(base_siniestros$HORA_PROCESADA)
+
+base_siniestros$tiempo = ifelse(base_siniestros$HORA_PROCESADA<=6 & base_siniestros$HORA_PROCESADA>=0,
+                        yes = "Madrugada",
+                        no = base_siniestros$HORA_PROCESADA)
+
+base_siniestros$tiempo = ifelse(base_siniestros$HORA_PROCESADA<=18 & base_siniestros$HORA_PROCESADA>6,
+                         yes = "Dia",
+                         no = base_siniestros$tiempo)
+
+base_siniestros$tiempo = ifelse(base_siniestros$HORA_PROCESADA<=24 & base_siniestros$HORA_PROCESADA>18,
+                         yes = "Noche",
+                         no = base_siniestros$tiempo)
 
 
 
