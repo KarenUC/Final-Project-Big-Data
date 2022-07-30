@@ -32,8 +32,8 @@ p_load(skimr, # summary data
 )
 
 
-setwd("C:/Users/pau_9/Documents/GitHub/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
-#setwd("C:/Users/kurib/OneDrive - Universidad de los Andes/Documentos/MECA/Github/Final-Project-Big-Data")
+#setwd("C:/Users/pau_9/Documents/GitHub/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
+setwd("C:/Users/kurib/OneDrive - Universidad de los Andes/Documentos/MECA/Github/Final-Project-Big-Data")
 
 # 2017 
 base_2017_victimas <- read_excel("stores/Base_2017.xlsx", sheet = "VICTIMAS")
@@ -279,15 +279,19 @@ glimpse(base_siniestros)
 
 
 class(base_siniestros$GravedadNombre) #Preferiria dejar solo dos categorias
+table(base_siniestros$GravedadNombre)
 
 base_siniestros$GravedadNombre[base_siniestros$GravedadNombre== "Con Heridos"] <- "Con Muertos" 
 
+#Ojo cambiar variable daños para que quede bien
+
 base_siniestros$GravedadNombre <- factor(base_siniestros$GravedadNombre, 
-                                                 levels = c("Con Muertos", "Solo DaÃ±os"),
+                                                 levels = c("Con Muertos", "Solo Daños"),
                                                  labels = c("Severo", "Leve"))  ## Poner variable como categorica
 class(base_siniestros$GravedadNombre)
 levels(base_siniestros$GravedadNombre)
 table(base_siniestros$GravedadNombre)
+sum(is.na(base_siniestros$GravedadNombre))
 
 ### HUMAN FACTOR
 
@@ -351,9 +355,113 @@ OI <- OI%>% select (1,4)
 base_siniestros <-left_join(base_siniestros,OI, by="idFormulario")
 
 
-# Gender ****** PENDIENTE
+# Gender ****** 
+
+# ------------- Conductores
+class(base_siniestros$num_hombres_c)
+class(base_siniestros$num_mujeres_c)
+
+sum(is.na(base_siniestros$num_hombres_c))
+sum(is.na(base_siniestros$num_mujeres_c))
+
+#Si existen NAs (es solo uno entonces se elimina)
+
+base_siniestros <- base_siniestros[!is.na(base_siniestros$num_hombres_c),]
+base_siniestros <- base_siniestros[!is.na(base_siniestros$num_mujeres_c),]
+
+sum(is.na(base_siniestros$num_hombres_c))
+sum(is.na(base_siniestros$num_mujeres_c)) ## Ya no quedan NAs
+
+# --------------- Victimas
+
+class(base_siniestros$num_hombres_v)
+class(base_siniestros$num_mujeres_v)
+
+sum(is.na(base_siniestros$num_hombres_v))
+sum(is.na(base_siniestros$num_mujeres_v))
 
 # Age
+
+class(base_siniestros$m_edad_c)
+class(base_siniestros$m_edad_v)
+
+sum(is.na(base_siniestros$m_edad_c))
+sum(is.na(base_siniestros$m_edad_v)) # Esta bien no existen NAs
+
+
+### ROAD FACTOR
+
+# Road Surface
+
+#Con Huecos
+
+class(base_siniestros$CON_HUECOS)
+table(base_siniestros$CON_HUECOS)
+
+base_siniestros$CON_HUECOS <- factor(base_siniestros$CON_HUECOS, 
+                                         levels = c("SI", "NO"),
+                                         labels = c("SI", "NO"))  ## Poner variable como categorica
+
+
+class(base_siniestros$CON_HUECOS)
+table(base_siniestros$CON_HUECOS)
+
+
+# Road Type
+
+class(base_siniestros$TipoDisenno)
+table(base_siniestros$TipoDisenno)
+
+base_siniestros$TipoDisenno <- factor(base_siniestros$TipoDisenno, 
+                                     levels = c("Cicloruta", "Glorieta", "Interseccion", "Lote o predio",
+                                                "Paso a nivel", "Paso elevado", "Paso inferior", "Ponton",
+                                                "Puente", "Tramo de Via"),
+                                     labels = c("Cicloruta", "Glorieta", "Interseccion", "Lote o predio",
+                                                "Paso a nivel", "Paso elevado", "Paso inferior", "Ponton",
+                                                "Puente", "Tramo de Via"))  ## Poner variable como categorica
+class(base_siniestros$TipoDisenno)
+table(base_siniestros$TipoDisenno)
+
+
+# Vehicles type ********PEDIENTE
+
+table(base_conductores$ClaseVehiculo)
+
+num_autos_c <- base_conductores %>% 
+              group_by(idFormulario) %>%
+              summarise(num_autos_c = sum(ClaseVehiculo == "Automovil"))
+
+num_bici_c <- base_conductores %>% 
+  group_by(idFormulario) %>%
+  summarise(num_bici_c = sum(ClaseVehiculo == "Bicicleta"))
+
+num_bicitaxi_c <- base_conductores %>% 
+  group_by(idFormulario) %>%
+  summarise(num_bicitaxi_c = sum(ClaseVehiculo == "Bicitaxi"))
+
+num_bus_c <- base_conductores %>% 
+  group_by(idFormulario) %>%
+  summarise(num_bus_c = sum(ClaseVehiculo == "Bus"))
+
+num_bus_c <- base_conductores %>% 
+  group_by(idFormulario) %>%
+  summarise(num_bus_c = sum(ClaseVehiculo == "Bus"))
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
