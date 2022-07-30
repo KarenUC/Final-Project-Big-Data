@@ -31,8 +31,8 @@ p_load(skimr, # summary data
        readxl
 )
 
-setwd("/Users/jdaviduu96/Documents/MECA 2022/Big Data y Machine Learning 2022-13/Final Project/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
-#setwd("C:/Users/pau_9/Documents/GitHub/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
+#setwd("/Users/jdaviduu96/Documents/MECA 2022/Big Data y Machine Learning 2022-13/Final Project/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
+setwd("C:/Users/pau_9/Documents/GitHub/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
 #setwd("C:/Users/kurib/OneDrive - Universidad de los Andes/Documentos/MECA/Github/Final-Project-Big-Data")
 
 # 2017 
@@ -471,6 +471,7 @@ table(base_siniestros$CON_HUECOS)
 
 class(base_siniestros$TipoDisenno)
 table(base_siniestros$TipoDisenno)
+summary(base_siniestros$TipoDisenno)
 
 base_siniestros$TipoDisenno <- factor(base_siniestros$TipoDisenno, 
                                      levels = c("Cicloruta", "Glorieta", "Interseccion", "Lote o predio",
@@ -478,10 +479,12 @@ base_siniestros$TipoDisenno <- factor(base_siniestros$TipoDisenno,
                                                 "Puente", "Tramo de Via"),
                                      labels = c("Cicloruta", "Glorieta", "Interseccion", "Lote o predio",
                                                 "Paso a nivel", "Paso elevado", "Paso inferior", "Ponton",
-                                                "Puente", "Tramo de Via"))  ## Poner variable como categorica
+                                                 "Puente", "Tramo de Via"))  ## Poner variable como categorica
+
 class(base_siniestros$TipoDisenno)
 table(base_siniestros$TipoDisenno)
 
+base_siniestros <- base_siniestros[!is.na(base_siniestros$TipoDisenno),]
 
 # Vehicles type Conductores
 
@@ -543,6 +546,7 @@ num_serv_pub_v <- base_victimas %>%
                                    VEHICULO_VIAJABA== "BUSETA"|
                                    VEHICULO_VIAJABA=="MICROBUS"))
 
+
 num_carga_v <- base_victimas %>% 
   group_by(idFormulario) %>%
   summarise(num_carga_v = sum(VEHICULO_VIAJABA == "CAMION, FURGON"|
@@ -555,9 +559,11 @@ num_moto_v <- base_victimas %>%
                                VEHICULO_VIAJABA== "MOTOCICLETA"|
                                VEHICULO_VIAJABA=="CUATRIMOTO"))
 
+
 num_bici_v <- base_victimas %>% 
   group_by(idFormulario) %>%
   summarise(num_bici_v = sum(VEHICULO_VIAJABA == "BICICLETA"))
+
 
 num_otro_vehi_v <- base_victimas %>% 
   group_by(idFormulario) %>%
@@ -567,6 +573,7 @@ num_otro_vehi_v <- base_victimas %>%
 num_peatones_v <- base_victimas %>% 
   group_by(idFormulario) %>%
   summarise(num_peatones_v = sum(VEHICULO_VIAJABA == "PEATON" ))
+
 
 ### Pegar a base de siniestros
 
@@ -584,6 +591,16 @@ base_siniestros<-left_join(base_siniestros,num_moto_v, by="idFormulario")
 base_siniestros <-left_join(base_siniestros,num_bici_v, by="idFormulario")
 base_siniestros <-left_join(base_siniestros,num_otro_vehi_v, by="idFormulario")
 base_siniestros<-left_join(base_siniestros,num_peatones_v, by="idFormulario")
+
+
+base_siniestros$num_autos_v  <- ifelse(is.na(base_siniestros$num_autos_v),0,base_siniestros$num_autos_v)
+base_siniestros$num_serv_pub_v <- ifelse(is.na(base_siniestros$num_serv_pub_v),0,base_siniestros$num_serv_pub_v)
+base_siniestros$num_carga_v <- ifelse(is.na(base_siniestros$num_carga_v),0,base_siniestros$num_carga_v)
+base_siniestros$num_moto_v <- ifelse(is.na(base_siniestros$num_moto_v),0,base_siniestros$num_moto_v)
+base_siniestros$num_bici_v <- ifelse(is.na(base_siniestros$num_bici_v),0,base_siniestros$num_bici_v)
+base_siniestros$num_otro_vehi_v <- ifelse(is.na(base_siniestros$num_otro_vehi_v),0,base_siniestros$num_otro_vehi_v)
+base_siniestros$num_peatones_v <- ifelse(is.na(base_siniestros$num_peatones_v),0,base_siniestrosv$num_peatones_v)
+
 
 #########--------Enviromental factors ---------#######################################
 
@@ -626,7 +643,6 @@ base_siniestros$tiempo = ifelse(base_siniestros$HORA_PROCESADA<=24 & base_sinies
 
 ############ Revisar NAS base_siniestros ######################
 summary(base_siniestros)
-
 
 
 
