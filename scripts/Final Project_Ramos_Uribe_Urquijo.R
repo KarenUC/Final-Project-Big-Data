@@ -31,9 +31,9 @@ p_load(skimr, # summary data
        readxl
 )
 
-setwd("/Users/jdaviduu96/Documents/MECA 2022/Big Data y Machine Learning 2022-13/Final Project/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
+#setwd("/Users/jdaviduu96/Documents/MECA 2022/Big Data y Machine Learning 2022-13/Final Project/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
 #setwd("C:/Users/pau_9/Documents/GitHub/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
-#setwd("C:/Users/kurib/OneDrive - Universidad de los Andes/Documentos/MECA/Github/Final-Project-Big-Data")
+setwd("C:/Users/kurib/OneDrive - Universidad de los Andes/Documentos/MECA/Github/Final-Project-Big-Data")
 
 # 2017 
 base_2017_victimas <- read_excel("stores/Base_2017.xlsx", sheet = "VICTIMAS")
@@ -283,7 +283,7 @@ base_siniestros$GravedadNombre[base_siniestros$GravedadNombre== "Con Heridos"] <
 #Ojo cambiar variable da?os para que quede bien
 
 base_siniestros$GravedadNombre <- factor(base_siniestros$GravedadNombre, 
-                                                 levels = c("Con Muertos", "Solo DaÃ±os"),
+                                                 levels = c("Con Muertos", "Solo Daños"),
                                                  labels = c("Severo", "Leve"))  ## Poner variable como categorica
 class(base_siniestros$GravedadNombre)
 levels(base_siniestros$GravedadNombre)
@@ -783,6 +783,19 @@ test_base_siniestros$hat_gravedad_05=ifelse(test_base_siniestros$lasso_upsample>
 with(test_base_siniestros,table(GravedadNombre,hat_gravedad_05))
 
 
+# Identificamos cuántos cores tiene nuestra máquina
+
+p_load(tidyverse, ggplot2, doParallel, rattle, MLmetrics,
+       janitor, fastDummies, tidymodels, caret)
+n_cores <- detectCores()
+print(paste("Mi PC tiene", n_cores, "nucleos"))
+
+# # Vamos a usar n_cores - 2 procesadores para esto
+# cl <- makePSOCKcluster(n_cores - 6) 
+# registerDoParallel(cl)
+# stopCluster(cl)
+
+
 ######--- XGBOOST ---######
 
 #Paquetes
@@ -830,30 +843,61 @@ pred_xgb_chap<-predict(xgboost_chap, final_chap)
 mae_xgb_chap<-291622240
 mse_xgb_chap<-(486091477)^2
 
+######--- DBSCAN ---######
 
+p_load(dbscan)
+colnames(train_base_siniestros)
 
+df_train <- train_base_siniestros[,-4]
+colnames(df_train)
 
+df_train <- select(df_train, TipoAccidente,CON_EMBRIAGUEZ ,
+                     CON_VELOCIDAD , Otrainfra_c_v,
+                     num_hombres_c , num_mujeres_c , num_hombres_v,
+                     num_mujeres_v , categorias_edad_c ,categorias_edad_v,
+                     CON_HUECOS , TipoDisenno , num_autos_c , num_serv_pub_c,
+                     num_carga_c, num_moto_c, num_bici_c, num_otro_vehi_c, num_autos_v,
+                     num_serv_pub_v, num_carga_v, num_moto_v, num_bici_v, num_otro_vehi_v,
+                     num_peatones_v, num_otro_c, tiempo, Dia, clima)
 
+df_train <- data.matrix(df_train)
+class(df_train)
 
-
-
-
-
-######################################################################################
-origAddress <- read.csv("stores/Base_2017_VIC", stringsAsFactors = FALSE)
-
-# Initialize the data frame
-geocoded <- data.frame(stringsAsFactors = FALSE)
-
-# Loop through the addresses to get the latitude and longitude of each address and add it to the
-# origAddress data frame in new columns lat and lon
-for(i in 1:nrow(origAddress))
-{
-  # Print("Working...")
-  result <- geocode(origAddress$addresses[i], output = "latlona", source = "google")
-  origAddress$lon[i] <- as.numeric(result[1])
-  origAddress$lat[i] <- as.numeric(result[2])
-  origAddress$geoAddress[i] <- as.character(result[3])
+auto_eps <- function(xdf, min_pts) { # Se introduce un dataset de dos columnas normalizadas.
+  A <- dbscan::kNNdist(xdf, k = min_pts)
+  Ar <- A[order(A)]
+  y <- Ar
+  x <- c(0:(length(Ar)-1))
+  # Normalizo antes de calcular la curvatura.
+  xr <- rescale(x)
+  yr <- rescale(y)
+  curvatura <- array() # Aquí se guardarán las pendientes.
+  # Cálculo de pendiente.
+  i = 1
+  while (i <= length(x)) {
+    curvatura[i] <- (yr[i+1]-yr[i])/(xr[i+1]-xr[i])
+    i <- i + 1
+  }
+  # Elijo el primer valor que supere la pendiente m
+  m <- 10   
+  primer <- first(which(curvatura >= m))
+  # Devuelve el valor eps óptimo
+  return(y[primer])
 }
-# Write a CSV file containing origAddress to the working directory
-write.csv(origAddress, "geocoded.csv", row.names=FALSE)
+
+epsilon <- auto_eps(df_train, min_pts)
+
+#df: dataset sin variable "species"
+#k: el número mínimo de puntos que elegimos
+
+kNNdist(df_train, k = 31)
+kNNdistplot(df_train, k = 31)
+abline(h = 18.5, lty = 2)
+
+#Con eps=18.2
+cl<-dbscan(df_train,eps=18.5,MinPts = 62)
+head(cbind(df_train,cl$cluster))
+
+hullplot(df_train,cl$cluster, main = "Convex cluster Hulls, eps= 3e+04")
+
+
