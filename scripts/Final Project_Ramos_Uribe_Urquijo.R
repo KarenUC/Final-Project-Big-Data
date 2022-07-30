@@ -47,12 +47,89 @@ base_2018_victimas <- read_excel("stores/Base_2018.xlsx", sheet = "VICTIMAS")
 base_2018_conductores <- read_excel("stores/Base_2018.xlsx", sheet = "CONDUCTORES")
 base_2018_siniestros <- read_excel("stores/Base_2018.xlsx", sheet = "ACCIDENTES")
 
-# 2019
-base_2019_victimas <- read_excel("stores/Base_2019.xlsx", sheet = "VICTIMAS")
-base_2019_conductores <- read_excel("stores/Base_2019.xlsx", sheet = "CONDUCTORES")
-base_2019_siniestros <- read_excel("stores/Base_2019.xlsx", sheet = "ACCIDENTES")
+# Unir bases en una sola
 
-# Unir bases
+# 2017
+base_2017_victimas$Year <- "2017"
+base_2017_victimas$idFormulario <- base_2017_victimas$id
+base_2017_conductores$Year <- "2017"
+base_2017_conductores$idFormulario <- base_2017_conductores$id
+base_2017_siniestros$Year <- "2017"
+base_2017_siniestros$idFormulario <- base_2017_siniestros$id
+
+# 2018
+base_2018_victimas$Year <- "2018"
+base_2018_conductores$Year <- "2018"
+base_2018_siniestros$Year <- "2018"
+
+
+glimpse(base_2017_siniestros)
+glimpse(base_2018_conductores)
+glimpse(base_2017_victimas)
+
+
+########## Seleccion Variables
+
+#2017
+
+base_2017_siniestros <- base_2017_siniestros %>% 
+                        select(idFormulario, Dia, Fecha, GravedadNombre, ClaseNombre, Latitud, 
+                               Longitud, Direccion, TipoDisenno, TipoTiempo, CON_BICICLETA,
+                               CON_CARGA, CON_EMBRIAGUEZ, CON_HUECOS, CON_MENORES, CON_MOTO,
+                               CON_PEATON, CON_PERSONA_MAYOR, CON_RUTAS, CON_TPI, CON_VELOCIDAD, Year)
+
+base_2017_conductores <- base_2017_conductores %>%
+                        select (idFormulario, Vehiculo, EDAD_PROCESADA, LLevaCinturon, LLevaChaleco, LLevaCasco,
+                                Sexo, PortaLicencia, ClaseVehiculo, ServicioVehiculo, Year)
+
+
+base_2017_victimas <- base_2017_victimas  %>%
+                      select (idFormulario, Numero, EDAD_PROCESADA, LLevaCinturon, LlevaChaleco, LLevaCasco,
+                              Sexo, VEHICULO_VIAJABA, Year)
+  
+#2018
+
+base_2018_siniestros <- base_2018_siniestros %>% 
+  select(idFormulario, Dia, Fecha, GravedadNombre, ClaseNombre, Latitud, 
+         Longitud, Direccion, TipoDisenno, TipoTiempo, CON_BICICLETA,
+         CON_CARGA, CON_EMBRIAGUEZ, CON_HUECOS, CON_MENORES, CON_MOTO,
+         CON_PEATON, CON_PERSONA_MAYOR, CON_RUTAS, CON_TPI, CON_VELOCIDAD, Year)
+
+base_2018_conductores <- base_2018_conductores %>%
+  select (idFormulario, Vehiculo, EDAD_PROCESADA, LLevaCinturon, LLevaChaleco, LLevaCasco,
+          Sexo, PortaLicencia, ClaseVehiculo, ServicioVehiculo, Year)
+
+
+base_2018_victimas <- base_2018_victimas  %>%
+  select (idFormulario, Numero, EDAD_PROCESADA, LLevaCinturon, LlevaChaleco, LLevaCasco,
+          Sexo, VEHICULO_VIAJABA, Year)
+
+
+### Unir Bases
+
+# Base Siniestros
+base_siniestros <- bind_rows(base_2017_siniestros, base_2018_siniestros)
+
+
+
+# Base Conductores
+glimpse(base_2017_conductores)
+glimpse(base_2018_conductores)
+base_2018_conductores$Vehiculo <- as.double(base_2018_conductores$Vehiculo)
+base_2018_conductores$EDAD_PROCESADA <- as.double(base_2018_conductores$EDAD_PROCESADA)
+
+
+base_conductores <- bind_rows(base_2017_conductores, base_2018_conductores)
+
+# Base Victimas
+
+glimpse(base_2017_victimas)
+glimpse(base_2018_victimas)
+
+base_2018_victimas$EDAD_PROCESADA <- as.double(base_2018_victimas$EDAD_PROCESADA)
+
+base_victimas <- bind_rows(base_2017_victimas, base_2018_victimas)
+
 
 
  ############### ========= CREACION VARIABLES ============ ##############
@@ -160,9 +237,9 @@ base_2017_siniestros <-base_2017_siniestros %>% left_join(num_mujeres_v,by="id")
                       #  Localidad, HoraOcurrencia, TipoTiempo, Vehiculo, Numero, m_edad_c, m_edad_v, num_hombres_c, num_mujeres_c, 
                       #   num_hombres_v, num_mujeres_v
 
-#### DEPENDENT VARIABLE
+### DEPENDENT VARIABLE
 
-# Variable Dependiente: Grado de severidad del choque (1 con muertos, 2 con heridos, 3 con daños) - Dejarla en 1 severo 0 no severo
+# Variable Dependiente: Grado de severidad del siniestro (1 con muertos, 2 con heridos, 3 con daños) - Dejarla en 1 severo 0 leve
 
 
 class(base_2017_siniestros$GravedadNombre) #Preferiria dejar solo dos categorias
@@ -183,13 +260,13 @@ table(base_2017_siniestros$GravedadNombre)
 class(base_2017_siniestros$ClaseNombre)
 table(base_2017_siniestros$ClaseNombre)
 
-base_2017_siniestros$ClaseNombre <- factor(base_2017_siniestros$ClaseNombre, 
+base_2017_siniestros$TipoAccidente <- factor(base_2017_siniestros$ClaseNombre, 
                                            levels = c("Atropello", "Autolesion", "Caida Ocupante", "Choque",
                                                       "Incendio", "Otro", "Volcamiento"),
                                            labels = c("Atropello", "Autolesion", "Caida Ocupante", "Choque",
                                                       "Incendio", "Otro", "Volcamiento"))  ## Poner variable como categorica
-class(base_2017_siniestros$ClaseNombre)
-table(base_2017_siniestros$ClaseNombre)
+class(base_2017_siniestros$TipoAccidente)
+table(base_2017_siniestros$TipoAccidente)
 
 # Violation of law: 
 
@@ -207,7 +284,7 @@ base_2017_siniestros$CON_EMBRIAGUEZ <- factor(base_2017_siniestros$CON_EMBRIAGUE
 class(base_2017_siniestros$CON_EMBRIAGUEZ)
 table(base_2017_siniestros$CON_EMBRIAGUEZ)
 
-#1. Velocidad
+#2. Velocidad
 
 class(base_2017_siniestros$CON_VELOCIDAD)
 table(base_2017_siniestros$CON_VELOCIDAD)
@@ -220,6 +297,17 @@ base_2017_siniestros$CON_VELOCIDAD <- factor(base_2017_siniestros$CON_VELOCIDAD,
 
 class(base_2017_siniestros$CON_VELOCIDAD)
 table(base_2017_siniestros$CON_VELOCIDAD)
+
+
+#3. Otro: No Porta Licencia, No lleva cinturon, No lleva caso, No lleva Chaleco
+
+
+
+
+
+
+
+
 
 # Gender ****** PENDIENTE
 
