@@ -51,11 +51,8 @@ base_2018_siniestros <- read_excel("stores/Base_2018.xlsx", sheet = "ACCIDENTES"
 
 # 2017
 base_2017_victimas$Year <- "2017"
-base_2017_victimas$idFormulario <- base_2017_victimas$id
 base_2017_conductores$Year <- "2017"
-base_2017_conductores$idFormulario <- base_2017_conductores$id
 base_2017_siniestros$Year <- "2017"
-base_2017_siniestros$idFormulario <- base_2017_siniestros$id
 
 # 2018
 base_2018_victimas$Year <- "2018"
@@ -446,6 +443,8 @@ num_bus_c <- base_conductores %>%
 num_bus_c <- base_conductores %>% 
   group_by(idFormulario) %>%
   summarise(num_bus_c = sum(ClaseVehiculo == "Bus"))
+
+
 
 
   
