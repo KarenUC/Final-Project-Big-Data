@@ -805,20 +805,24 @@ grid<- expand.grid(nrounds = c(250,500),
 set.seed(1410)
 
 xgboost <- train(
-  price ~ new_piso_vf + new_estrato_vf + new_cuartos_vf +
-    surface_total2 + dist_bar + dist_parque +
-    dist_banco + dist_estacionbus +dist_police +
-    new_banos_vf + apto,
-  data = final_chap,
+  GravedadNombre ~ TipoAccidente + CON_EMBRIAGUEZ + 
+    CON_VELOCIDAD + Otrainfra_c_v + 
+    num_hombres_c + num_mujeres_c + num_hombres_v+
+    num_mujeres_v + categorias_edad_c +categorias_edad_v+
+    CON_HUECOS + TipoDisenno + num_autos_c + num_serv_pub_c+
+    num_carga_c+num_moto_c+num_bici_c+num_otro_vehi_c+num_autos_v+
+    num_serv_pub_v+num_carga_v+num_moto_v+num_bici_v+num_otro_vehi_v+num_peatones_v+
+    num_otro_c+tiempo+Dia+clima,
+  data = train_base_siniestros,
   method = "xgbTree",
   trControl = ctrl,
-  metric = "RMSE",
-  tuneGrid = grid_price,
+  metric = "Sens",
+  tuneGrid = grid,
   preProcess = c("center", "scale")
 )
 
-xgboost_chap$bestTune
-xgboost_chap_Results <- xgboost_chap$results
+xgboost$bestTune
+xgboost_Results <- xgboost$results
 
 #---Predicciones
 pred_xgb_chap<-predict(xgboost_chap, final_chap)
