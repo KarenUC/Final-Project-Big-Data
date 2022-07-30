@@ -351,6 +351,7 @@ OI$Otrainfra_c_v<-ifelse((OI$OtraInfrac>=1 | OI$OtraInfrav>=1 ),1, 0)
 OI <- OI%>% select (1,4) 
 base_siniestros <-left_join(base_siniestros,OI, by="idFormulario")
 base_siniestros$Otrainfra_c_v <- ifelse(is.na(base_siniestros$Otrainfra_c_v), 0, base_siniestros$Otrainfra_c_v)
+base_siniestros$Otrainfra_c_v <- factor(base_siniestros$Otrainfra_c_v)
 
 # Gender ****** 
 
@@ -641,14 +642,185 @@ base_siniestros$tiempo = ifelse(base_siniestros$HORA_PROCESADA<=24 & base_sinies
                          no = base_siniestros$tiempo)
 
 
+base_siniestros$Dia <- factor(base_siniestros$Dia)
+base_siniestros$clima <- factor(base_siniestros$clima)
+base_siniestros$tiempo <- factor(base_siniestros$tiempo)
+base_siniestros$SD <- factor(base_siniestros$SD)
+base_siniestros$Year <- factor(base_siniestros$Year)
+
+
+
 ############ Revisar NAS base_siniestros ######################
 summary(base_siniestros)
+glimpse(base_siniestros)
+
+######################################################################################
+############################# Dividir base ###########################################
+######################################################################################
+
+# Partimos nuestra base aleatoriamente. Así garantizamos que se conserve la distribución en las marcas.
+set.seed(123)
+n <- 0.8*nrow(base_siniestros)
+n <- round(n, 0)
+index <- sample(1:nrow(base_siniestros), n)
+train_base_siniestros <- base_siniestros[index,]
+test_base_siniestros <- base_siniestros[-index,]
+#Verificamos que la partición sea adecuada
+prop.table(table(train_base_siniestros$GravedadNombre))
+prop.table(table(test_base_siniestros$GravedadNombre))
+prop.table(table(base_siniestros$GravedadNombre))
+
+# ######################################################################################
+# #################-------Balancear muestra----------###################################
+# ######################################################################################
+table(base_siniestros$GravedadNombre)
+#Upsampling
+set.seed(123)
+train_upSampled_base <- upSample(x = train_base_siniestros,
+                           y = train_base_siniestros$GravedadNombre,
+                           yname = "GravedadNombre")
+
+dim(train_base_siniestros)
+dim(train_upSampled_base)
+table(train_upSampled_base$GravedadNombre)
+table(base_siniestros$GravedadNombre)
+
+#Downsampling
+set.seed(123)
+train_downSampled_base <- downSample(x = train_base_siniestros,
+                                 y = train_base_siniestros$GravedadNombre,
+                                 yname = "GravedadNombre")
+
+dim(train_base_siniestros)
+dim(train_downSampled_base)
+table(train_downSampled_base$GravedadNombre)
+table(base_siniestros$GravedadNombre)
+
+
+######################################################################################
+#############################----MODELOS----##########################################
+######################################################################################
+
+######--- LOGIT ----####
+
+set.seed(123)
+fiveStats <- function(...) c(twoClassSummary(...), defaultSummary(...))
+ctrl <- trainControl(method = "cv",
+                           number = 5,
+                           summaryFunction = fiveStats,
+                           classProbs = TRUE,
+                           verbose=FALSE,
+                           savePredictions = T)
+lambda_grid <- 10^seq(-4, 0.01, length = 100)
+
+
+logit_lasso_upsample <- train(GravedadNombre ~ TipoAccidente + CON_EMBRIAGUEZ + 
+                                                 CON_VELOCIDAD + Otrainfra_c_v + 
+                                                num_hombres_c + num_mujeres_c + num_hombres_v+
+                                                num_mujeres_v + categorias_edad_c +categorias_edad_v+
+                                                CON_HUECOS + TipoDisenno + num_autos_c + num_serv_pub_c+
+                                                num_carga_c+num_moto_c+num_bici_c+num_otro_vehi_c+num_autos_v+
+                                                num_serv_pub_v+num_carga_v+num_moto_v+num_bici_v+num_otro_vehi_v+num_peatones_v+
+                                                num_otro_c+tiempo+Dia+clima,
+                                data = train_upSampled_base,
+                                method = "glmnet",
+                                trControl = ctrl,
+                                family = "binomial",
+                                metric = "ROC",
+                                tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+                                preProcess = c("center", "scale")
+)
+
+
+logit_lasso_upsample
+logit_lasso_upsample[["bestTune"]]
+
+result_lassoupsample <- logit_lasso_upsample[["results"]][60,-1]
+
+#########--Predicción --- ##########################################################################################################################
+
+train_base_siniestros$lasso_upsample<- predict(logit_lasso_upsample,
+                                     newdata = train_base_siniestros,
+                                     type = "prob")[,1]
+
+summary(train_base_siniestros$GravedadNombre)
+summary(train_base_siniestros$lasso_upsample)
+
+######## Determinar cutoff ###########################################################################################################################
+
+p_load(pROC)
+rfROC <- roc(train_base_siniestros$GravedadNombre, train_base_siniestros$lasso_upsample, levels = rev(levels(train_base_siniestros$GravedadNombre)))
+rfROC
+rfThresh <- coords(rfROC, x = "best", best.method = "closest.topleft")
+rfThresh
+
+#### el corte es  0.5250239
+
+train_base_siniestros <- train_base_siniestros %>% group_by(idFormulario) %>% mutate(hat_gravedad_05=ifelse(train_base_siniestros$lasso_upsample>0.5,"Severo","Leve"),
+                                      hat_gravedad_rfThresh=ifelse(train_base_siniestros$lasso_upsample>rfThresh$threshold,"Severo","Leve"))
+
+##### Matriz de confusión ################
+
+with(testResults,table(Pobre,lasso_upsample))
+cm_logit = confusionMatrix(data=factor(train_base_siniestros$lasso_upsample) , 
+                           reference=factor(train_base_siniestros$GravedadNombre) , 
+                           mode="sens_spec" , positive="1")
+
+
+
+######--- XGBOOST ---######
+
+#Paquetes
+
+p_load(xgboost)
+p_load(caret)
+
+# Semilla
+set.seed(123)
+
+require("xgboost")
+
+grid<- expand.grid(nrounds = c(250,500),
+                         max_depth = c(4,6,8),
+                         eta = c(0.01,0.3,0.5),
+                         gamma = c(0,1),
+                         min_child_weight = c(10, 25,50),
+                         colsample_bytree = c(0.7),
+                         subsample = c(0.6))
+set.seed(1410)
+
+xgboost <- train(
+  price ~ new_piso_vf + new_estrato_vf + new_cuartos_vf +
+    surface_total2 + dist_bar + dist_parque +
+    dist_banco + dist_estacionbus +dist_police +
+    new_banos_vf + apto,
+  data = final_chap,
+  method = "xgbTree",
+  trControl = ctrl,
+  metric = "RMSE",
+  tuneGrid = grid_price,
+  preProcess = c("center", "scale")
+)
+
+xgboost_chap$bestTune
+xgboost_chap_Results <- xgboost_chap$results
+
+#---Predicciones
+pred_xgb_chap<-predict(xgboost_chap, final_chap)
+
+mae_xgb_chap<-291622240
+mse_xgb_chap<-(486091477)^2
+
+
+
+
+
+
 
 
 
 
 ######################################################################################
-
 origAddress <- read.csv("stores/Base_2017_VIC", stringsAsFactors = FALSE)
 
 # Initialize the data frame
