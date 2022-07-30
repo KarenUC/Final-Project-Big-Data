@@ -32,8 +32,8 @@ p_load(skimr, # summary data
 )
 
 #setwd("/Users/jdaviduu96/Documents/MECA 2022/Big Data y Machine Learning 2022-13/Final Project/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
-#setwd("C:/Users/pau_9/Documents/GitHub/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
-setwd("C:/Users/kurib/OneDrive - Universidad de los Andes/Documentos/MECA/Github/Final-Project-Big-Data")
+setwd("C:/Users/pau_9/Documents/GitHub/Final-Project_Big-Data_Ramos-Uribe-Urquijo")
+#setwd("C:/Users/kurib/OneDrive - Universidad de los Andes/Documentos/MECA/Github/Final-Project-Big-Data")
 
 # 2017 
 base_2017_victimas <- read_excel("stores/Base_2017.xlsx", sheet = "VICTIMAS")
@@ -283,7 +283,7 @@ base_siniestros$GravedadNombre[base_siniestros$GravedadNombre== "Con Heridos"] <
 #Ojo cambiar variable da?os para que quede bien
 
 base_siniestros$GravedadNombre <- factor(base_siniestros$GravedadNombre, 
-                                                 levels = c("Con Muertos", "Solo Daños"),
+                                                 levels = c("Con Muertos", "Solo DaÃ±os"),
                                                  labels = c("Severo", "Leve"))  ## Poner variable como categorica
 class(base_siniestros$GravedadNombre)
 levels(base_siniestros$GravedadNombre)
@@ -783,7 +783,7 @@ test_base_siniestros$hat_gravedad_05=ifelse(test_base_siniestros$lasso_upsample>
 with(test_base_siniestros,table(GravedadNombre,hat_gravedad_05))
 
 
-# Identificamos cuántos cores tiene nuestra máquina
+# Identificamos cu?ntos cores tiene nuestra m?quina
 
 p_load(tidyverse, ggplot2, doParallel, rattle, MLmetrics,
        janitor, fastDummies, tidymodels, caret)
@@ -849,6 +849,7 @@ p_load(dbscan)
 colnames(train_base_siniestros)
 
 df_train <- train_base_siniestros[,-4]
+df_train <- train_base_siniestros[,-1]
 colnames(df_train)
 
 df_train <- select(df_train, TipoAccidente,CON_EMBRIAGUEZ ,
@@ -862,42 +863,28 @@ df_train <- select(df_train, TipoAccidente,CON_EMBRIAGUEZ ,
 
 df_train <- data.matrix(df_train)
 class(df_train)
-
-auto_eps <- function(xdf, min_pts) { # Se introduce un dataset de dos columnas normalizadas.
-  A <- dbscan::kNNdist(xdf, k = min_pts)
-  Ar <- A[order(A)]
-  y <- Ar
-  x <- c(0:(length(Ar)-1))
-  # Normalizo antes de calcular la curvatura.
-  xr <- rescale(x)
-  yr <- rescale(y)
-  curvatura <- array() # Aquí se guardarán las pendientes.
-  # Cálculo de pendiente.
-  i = 1
-  while (i <= length(x)) {
-    curvatura[i] <- (yr[i+1]-yr[i])/(xr[i+1]-xr[i])
-    i <- i + 1
-  }
-  # Elijo el primer valor que supere la pendiente m
-  m <- 10   
-  primer <- first(which(curvatura >= m))
-  # Devuelve el valor eps óptimo
-  return(y[primer])
-}
-
-epsilon <- auto_eps(df_train, min_pts)
+df_train <-scale(df_train)
 
 #df: dataset sin variable "species"
-#k: el número mínimo de puntos que elegimos
+#k: el n?mero m?nimo de puntos que elegimos
 
-kNNdist(df_train, k = 31)
-kNNdistplot(df_train, k = 31)
-abline(h = 18.5, lty = 2)
+kNNdist(df_train, k = 33)
+kNNdistplot(df_train, k = 33)
+abline(h = 8, lty = 2)
 
 #Con eps=18.2
-cl<-dbscan(df_train,eps=18.5,MinPts = 62)
+cl<-dbscan(df_train,eps=8,MinPts = 60)
 head(cbind(df_train,cl$cluster))
 
-hullplot(df_train,cl$cluster, main = "Convex cluster Hulls, eps= 3e+04")
+##DBSCAN clustering for 57569 objects.
+# Parameters: eps = 4, minPts = 60
+# The clustering contains 1 cluster(s) and 108 noise points.
+# 
+# 0     1 
+# 108 57461 
+# 
+# Available fields: cluster, eps, minPts
+p_load(factoextra)
 
+fviz_cluster(cl, df_train, geom = "point")
 
