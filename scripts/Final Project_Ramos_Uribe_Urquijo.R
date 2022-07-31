@@ -924,7 +924,16 @@ fviz_cluster(cl, df_train, geom = "point")
 hullplot(df_train, cl$cluster)
 table(train_base_siniestros$num_moto_c, cl$cluster)
 
-
-prop.table(table(train_base_siniestros$num_moto_c, cl$cluster))*100
-
+# Tables
+Tiempo <- as.data.frame.matrix(prop.table(table(train_base_siniestros$tiempo, cl$cluster))*100)
+Dia <- as.data.frame.matrix(prop.table(table(train_base_siniestros$Dia, cl$cluster))*100)
+Tipo_Accidente <- as.data.frame.matrix(prop.table(table(train_base_siniestros$TipoAccidente, cl$cluster))*100)
+Huecos <- as.data.frame.matrix(prop.table(table(train_base_siniestros$CON_HUECOS, cl$cluster))*100)
+Clima <- as.data.frame.matrix(prop.table(table(train_base_siniestros$clima, cl$cluster))*100)
+TipoVia <- as.data.frame.matrix(prop.table(table(train_base_siniestros$TipoDisenno, cl$cluster))*100)
+Motos <- as.data.frame.matrix(prop.table(table(train_base_siniestros$num_moto_c, cl$cluster))*100)
+Hombres_Conductores <- as.data.frame.matrix(prop.table(table(train_base_siniestros$num_hombres_c, cl$cluster))*100)
+Victima_Joven <- as.data.frame.matrix(prop.table(table(train_base_siniestros$categorias_edad_v, cl$cluster))*100)
+Victima_Peaton <- as.data.frame.matrix(prop.table(table(train_base_siniestros$num_peatones_v, cl$cluster))*100)
+Mujeres_Victimas <- as.data.frame.matrix(prop.table(table(train_base_siniestros$num_mujeres_v, cl$cluster))*100)
 
