@@ -835,7 +835,7 @@ xgboost <- train(
 )
 
 xgboost$bestTune
-xgboost_Results <- xgboost$results
+xgboost_Results <- as.data.frame(xgboost$results[30,])
 
 #---Variable Importance
 
@@ -847,10 +847,10 @@ var_imp_xgb<- as.data.frame(var_imp_xgb)
 class(var_imp_xgb)
 
 rownames(var_imp_xgb) = c("No.Motos Conductor", "Tipo Accidente = Choque", "No. Bicis Conductor", 
-                              "No. Peatones Víctimas", "No. Autos Conductores", "Victima Joven", "No. Mujeres Victimas",
+                              "No. Peatones V?ctimas", "No. Autos Conductores", "Victima Joven", "No. Mujeres Victimas",
                               "No. Hombres Victimas", "No. Motos Victimas", "No. Autos Victimas", "No. Servicio Pub. Conductor",
-                              "No. Carga Conductor", "No. Hombres Conductor", "Intersección", "Madrugada", "Conductor Joven", "Tramo Vía",
-                              "Mujeres Conductor", "Otra Infracción", "Viernes")
+                              "No. Carga Conductor", "No. Hombres Conductor", "Intersecci?n", "Madrugada", "Conductor Joven", "Tramo V?a",
+                              "Mujeres Conductor", "Otra InfracciÃ³n", "Viernes")
                           
                           
 var_imp_xgb$varnames<- rownames(var_imp_xgb)
@@ -864,6 +864,9 @@ ggplot(var_imp_xgb, aes(x=reorder(varnames, var_imp_xgb), y=var_imp_xgb)) +
   coord_flip()
 
 # Predictions
+
+test_base_siniestros$pred_xgb<-predict(xgboost, test_base_siniestros)
+with(test_base_siniestros,table(GravedadNombre,pred_xgb))
 
 ######--- DBSCAN ---######
 
