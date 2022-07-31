@@ -838,10 +838,29 @@ xgboost$bestTune
 xgboost_Results <- xgboost$results
 
 #---Predicciones
-pred_xgb_chap<-predict(xgboost_chap, final_chap)
 
-mae_xgb_chap<-291622240
-mse_xgb_chap<-(486091477)^2
+var_imp<- varImp(xgboost, scale = FALSE)
+plot(var_imp)
+
+var_imp_xgb <- var_imp$importance
+var_imp_xgb<- as.data.frame(var_imp_xgb)
+class(var_imp_xgb)
+
+rownames(var_imp_xgb) = c("No.Motos Conductor", "Tipo Accidente = Choque", "No.. Bicis Conductor", 
+                              "No. Peatones Víctimas", "No. Autos Conductores", "Victima Joven", "No. Mujeres Victimas",
+                              "No. Hombres Victimas", "No. Motos Victimas", "No. Autos Victimas", "No. Servicio Pub. Conductor",
+                              "No. Carga Conductor", "No. Hombres Conductor", "Intersección", "Madrugada", "Conductor Joven", "Tramo Vía",
+                              "Mujeres Conductor", "Otra Infracción", "Viernes", "Noche", "Miércoles", "Jueves", "Sábado", "Martes", "Lunes",
+                              "Servicio Publico Victima", "Conductor Mayor", "Volcamiento")
+var_imp_xgb_pob$varnames<- rownames(var_imp_xgb_pob)
+
+
+ggplot(var_imp_xgb_pob, aes(x=reorder(varnames, Overall), y=Overall)) + 
+  geom_point() +
+  geom_segment(aes(x=varnames,xend=varnames,y=0,yend=Overall), color = "#56B4E9") +
+  ylab("Importance") +
+  xlab("Variable Name") +
+  coord_flip()
 
 ######--- DBSCAN ---######
 
