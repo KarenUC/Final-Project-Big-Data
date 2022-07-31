@@ -876,6 +876,7 @@ with(test_base_siniestros,table(GravedadNombre,pred_xgb))
 p_load(DiagrammeR)
 xgb.plot.tree(model = xgboost$finalModel, trees = 0)
 
+
 ######--- DBSCAN ---######
 
 p_load(dbscan)
