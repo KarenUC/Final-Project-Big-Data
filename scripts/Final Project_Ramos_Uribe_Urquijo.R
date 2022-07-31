@@ -909,7 +909,7 @@ abline(h = 10, lty = 2)
 #Con eps=18.2
 cl<-dbscan(df_train,eps=10,MinPts = 62)
 head(cbind(df_train,cl$cluster))
-
+cl
 # DBSCAN clustering for 57569 objects.
 # Parameters: eps = 10, minPts = 62
 # The clustering contains 4 cluster(s) and 150 noise points.
@@ -921,4 +921,10 @@ head(cbind(df_train,cl$cluster))
 p_load(factoextra)
 
 fviz_cluster(cl, df_train, geom = "point")
+hullplot(df_train, cl$cluster)
+table(train_base_siniestros$num_moto_c, cl$cluster)
+
+
+prop.table(table(train_base_siniestros$num_moto_c, cl$cluster))*100
+
 
