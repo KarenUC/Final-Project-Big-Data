@@ -846,13 +846,13 @@ mse_xgb_chap<-(486091477)^2
 ######--- DBSCAN ---######
 
 p_load(dbscan)
-colnames(train_base_siniestros)
+colnames(base_siniestros)
 
 df_train <- train_base_siniestros[,-4]
-df_train <- train_base_siniestros[,-1]
+df_train <- df_train[,-1]
 colnames(df_train)
 
-df_train <- select(df_train, TipoAccidente,CON_EMBRIAGUEZ ,
+df_train<- select(df_train, TipoAccidente,CON_EMBRIAGUEZ ,
                      CON_VELOCIDAD , Otrainfra_c_v,
                      num_hombres_c , num_mujeres_c , num_hombres_v,
                      num_mujeres_v , categorias_edad_c ,categorias_edad_v,
@@ -863,25 +863,25 @@ df_train <- select(df_train, TipoAccidente,CON_EMBRIAGUEZ ,
 
 df_train <- data.matrix(df_train)
 class(df_train)
-df_train <-scale(df_train)
+df_train  <-scale(df_train)
 
 #df: dataset sin variable "species"
 #k: el n?mero m?nimo de puntos que elegimos
 
-kNNdist(df_train, k = 33)
-kNNdistplot(df_train, k = 33)
-abline(h = 8, lty = 2)
+kNNdist(df_train , k = 31)
+kNNdistplot(df_train, k = 31)
+abline(h = 10, lty = 2)
 
 #Con eps=18.2
-cl<-dbscan(df_train,eps=8,MinPts = 60)
+cl<-dbscan(df_train,eps=10,MinPts = 62)
 head(cbind(df_train,cl$cluster))
 
 # DBSCAN clustering for 57569 objects.
-# Parameters: eps = 8, minPts = 60
-# The clustering contains 6 cluster(s) and 228 noise points.
+# Parameters: eps = 10, minPts = 62
+# The clustering contains 4 cluster(s) and 150 noise points.
 # 
-# 0     1     2     3     4     5     6 
-# 228 55085   388   638   471   687    72 
+# 0     1     2     3     4 
+# 150 56465   399   480    75 
 # 
 # Available fields: cluster, eps, minPts
 p_load(factoextra)
