@@ -864,7 +864,11 @@ ggplot(var_imp_xgb, aes(x=reorder(varnames, var_imp_xgb), y=var_imp_xgb)) +
   coord_flip()
 
 # Predictions
+#Train
+train_base_siniestros$pred_xgb<-predict(xgboost, train_base_siniestros)
+with(train_base_siniestros,table(GravedadNombre,pred_xgb))
 
+#Test
 test_base_siniestros$pred_xgb<-predict(xgboost, test_base_siniestros)
 with(test_base_siniestros,table(GravedadNombre,pred_xgb))
 
