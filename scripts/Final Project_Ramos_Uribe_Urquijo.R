@@ -872,6 +872,10 @@ with(train_base_siniestros,table(GravedadNombre,pred_xgb))
 test_base_siniestros$pred_xgb<-predict(xgboost, test_base_siniestros)
 with(test_base_siniestros,table(GravedadNombre,pred_xgb))
 
+#
+p_load(DiagrammeR)
+xgb.plot.tree(model = xgboost$finalModel, trees = 0)
+
 ######--- DBSCAN ---######
 
 p_load(dbscan)
