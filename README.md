@@ -11,7 +11,7 @@ Este trabajo contiene:
 - `stores`: Bases utilizadas (Anuario de Siniestralidad vial 2017 y 2018)
 - `views`: Imágenes
 
-## :mortar_board: Authors
+## :mortar_board: Autores
 
 - Paula Ramos - [paularamj](https://github.com/paularamj)
 - Karen Uribe-Chaves - [KarenUC](https://github.com/KarenUC)
