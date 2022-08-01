@@ -782,6 +782,35 @@ test_base_siniestros$hat_gravedad_05=ifelse(test_base_siniestros$lasso_upsample>
 
 with(test_base_siniestros,table(GravedadNombre,hat_gravedad_05))
 
+### 
+var_imp2 <- varImp(logit_lasso_upsample, scale = T)
+plot(var_imp2)
+
+var_imp_logitlasso <- var_imp2$importance
+
+var_imp_logitlasso<- as.data.frame(var_imp_logitlasso)
+class(var_imp_logitlasso)
+var_imp_logitlasso<- var_imp_logitlasso %>% dplyr::arrange(-Overall)
+var_imp_logitlasso<- as.data.frame(var_imp_logitlasso)
+var_imp_logitlasso<-var_imp_logitlasso[1:20,]
+var_imp_logitlasso<- as.data.frame(var_imp_logitlasso)
+
+rownames(var_imp_logitlasso) = c("No.Conductores Moto", "No. Conductores Bici", "No. Conductores de Autos", "No. Mujeres Victimas",
+                          "Tipo de Accidente = Choque", "No. Víctimas en Auto", "No. Hombres Victimas", "No. Peatones Víctimas",
+                          "Víctima Joven", "No. Motos Víctimas", "No. Conductores Vehículo Carga", "No. Conductores Serv. Público",
+                          "No. Víctimas Serv. Público", "Caída Ocupante", "Otra Infracción", "Víctima Mayor", "Víctima Anciano", 
+                          "Víctima Menor de Edad", "Madrugada", "Sin Velocidad")
+             
+
+var_imp_logitlasso$varnames<- rownames(var_imp_logitlasso)
+
+
+ggplot(var_imp_logitlasso, aes(x=reorder(varnames, var_imp_logitlasso), y=var_imp_logitlasso)) + 
+  geom_point() +
+  geom_segment(aes(x=varnames,xend=varnames,y=0,yend=var_imp_logitlasso), color = "Blue") +
+  ylab("Importance") +
+  xlab("Variable Name") +
+  coord_flip()
 
 # Identificamos cu?ntos cores tiene nuestra m?quina
 
@@ -846,11 +875,11 @@ var_imp_xgb <- var_imp$importance[1:20,]
 var_imp_xgb<- as.data.frame(var_imp_xgb)
 class(var_imp_xgb)
 
-rownames(var_imp_xgb) = c("No.Motos Conductor", "Tipo Accidente = Choque", "No. Bicis Conductor", 
-                              "No. Peatones V?ctimas", "No. Autos Conductores", "Victima Joven", "No. Mujeres Victimas",
-                              "No. Hombres Victimas", "No. Motos Victimas", "No. Autos Victimas", "No. Servicio Pub. Conductor",
-                              "No. Carga Conductor", "No. Hombres Conductor", "Intersecci?n", "Madrugada", "Conductor Joven", "Tramo V?a",
-                              "Mujeres Conductor", "Otra InfracciÃ³n", "Viernes")
+rownames(var_imp_xgb) = c("No.Conductores Moto", "Tipo Accidente = Choque", "No.Conductores Bici", 
+                              "No. Peatones Víctimas", "No. Conductores Autos", "Victima Joven", "No. Mujeres Victimas",
+                              "No. Hombres Victimas", "No. Motos Victimas", "No. Autos Victimas", "No. Conductores Servicio Pub",
+                              "No.Conductores Vehículo Carga", "No. Hombres Conductores", "Intersección", "Madrugada", "Conductor Joven", "Tramo Vía",
+                              "No. Mujeres Conductores", "Otra Infracción", "Viernes")
                           
                           
 var_imp_xgb$varnames<- rownames(var_imp_xgb)
