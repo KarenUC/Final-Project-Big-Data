@@ -736,6 +736,8 @@ logit_lasso_upsample
 logit_lasso_upsample[["bestTune"]]
 
 result_lassoupsample <- logit_lasso_upsample[["results"]][60,-1]
+p_load(xtable)
+xtable(result_lassoupsample)
 
 #########--Predicci√≥n --- ##########################################################################################################################
 
@@ -781,6 +783,7 @@ test_base_siniestros$hat_gravedad_05=ifelse(test_base_siniestros$lasso_upsample>
 ##### Matriz de confusi√≥n ################
 
 with(test_base_siniestros,table(GravedadNombre,hat_gravedad_05))
+## FPR 2.7%	FNR 16.9%
 
 ### 
 var_imp2 <- varImp(logit_lasso_upsample, scale = T)
@@ -796,10 +799,10 @@ var_imp_logitlasso<-var_imp_logitlasso[1:20,]
 var_imp_logitlasso<- as.data.frame(var_imp_logitlasso)
 
 rownames(var_imp_logitlasso) = c("No.Conductores Moto", "No. Conductores Bici", "No. Conductores de Autos", "No. Mujeres Victimas",
-                          "Tipo de Accidente = Choque", "No. VÌctimas en Auto", "No. Hombres Victimas", "No. Peatones VÌctimas",
-                          "VÌctima Joven", "No. Motos VÌctimas", "No. Conductores VehÌculo Carga", "No. Conductores Serv. P˙blico",
-                          "No. VÌctimas Serv. P˙blico", "CaÌda Ocupante", "Otra InfracciÛn", "VÌctima Mayor", "VÌctima Anciano", 
-                          "VÌctima Menor de Edad", "Madrugada", "Sin Velocidad")
+                          "Tipo de Accidente = Choque", "No. V?ctimas en Auto", "No. Hombres Victimas", "No. Peatones V?ctimas",
+                          "V?ctima Joven", "No. Motos V?ctimas", "No. Conductores Veh?culo Carga", "No. Conductores Serv. P?blico",
+                          "No. V?ctimas Serv. P?blico", "Ca?da Ocupante", "Otra Infracci?n", "V?ctima Mayor", "V?ctima Anciano", 
+                          "V?ctima Menor de Edad", "Madrugada", "Sin Velocidad")
              
 
 var_imp_logitlasso$varnames<- rownames(var_imp_logitlasso)
@@ -876,10 +879,10 @@ var_imp_xgb<- as.data.frame(var_imp_xgb)
 class(var_imp_xgb)
 
 rownames(var_imp_xgb) = c("No.Conductores Moto", "Tipo Accidente = Choque", "No.Conductores Bici", 
-                              "No. Peatones VÌctimas", "No. Conductores Autos", "Victima Joven", "No. Mujeres Victimas",
+                              "No. Peatones V?ctimas", "No. Conductores Autos", "Victima Joven", "No. Mujeres Victimas",
                               "No. Hombres Victimas", "No. Motos Victimas", "No. Autos Victimas", "No. Conductores Servicio Pub",
-                              "No.Conductores VehÌculo Carga", "No. Hombres Conductores", "IntersecciÛn", "Madrugada", "Conductor Joven", "Tramo VÌa",
-                              "No. Mujeres Conductores", "Otra InfracciÛn", "Viernes")
+                              "No.Conductores Veh?culo Carga", "No. Hombres Conductores", "Intersecci?n", "Madrugada", "Conductor Joven", "Tramo V?a",
+                              "No. Mujeres Conductores", "Otra Infracci?n", "Viernes")
                           
                           
 var_imp_xgb$varnames<- rownames(var_imp_xgb)
